@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VibeGuide — курс по вайбкодингу</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;600;800&family=Roboto+Condensed:wght@500;700&display=swap">
+<style>
+/* Палитра: приглушённый винный ряд + графитовый фон. Объём даём слоями теней и «жёсткими» смещёнными тенями */
+:root{--bg:#0C0032;--card:#140050;--ink:#f5f3ff;--muted:#b3a9d9;--line:#3d2aa0;--wine:#240090;--deep:#2b00ad;--accent:#3500D3;--hi:#6a3dff;--link:#b9a6ff;--ok:#7fd9a3;--bad:#f2a0ae;--edge:#000000;--press:#190061;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font:18px/1.7 "Onest",system-ui,sans-serif;
+  background:radial-gradient(circle at 12% 8%,rgba(53,0,211,.35),transparent 38%),radial-gradient(circle at 92% 80%,rgba(36,0,144,.55),transparent 42%),repeating-linear-gradient(135deg,rgba(255,255,255,.025) 0 2px,transparent 2px 14px),var(--bg);background-attachment:fixed}
+.layout{display:grid;grid-template-columns:minmax(240px,320px) 1fr;gap:clamp(28px,4vw,56px);max-width:1480px;margin:0 auto;padding:32px 32px 56px}
+@media(max-width:760px){.layout{grid-template-columns:1fr;gap:32px;padding:20px 14px 40px}}
+
+/* Боковая панель — «приподнятый» блок */
+aside{position:sticky;top:16px;align-self:start;padding:22px;border:2px solid var(--line);border-radius:16px;background:linear-gradient(160deg,#1d0070,#10003f);box-shadow:8px 8px 0 var(--wine),0 18px 40px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08)}
+@media(max-width:760px){aside{position:static;box-shadow:5px 5px 0 var(--wine),0 12px 28px rgba(0,0,0,.5)}}
+h1{font-size:30px;line-height:1.15;font-weight:800;margin:0 0 22px;padding-bottom:14px;border-bottom:4px solid var(--accent);box-shadow:0 6px 0 var(--wine);text-shadow:2px 2px 0 var(--deep),4px 4px 0 var(--wine)}
+.bar{height:16px;background:#1e1e1e;border:2px solid var(--edge);border-radius:8px;overflow:hidden;margin:20px 0 8px;box-shadow:inset 0 3px 6px rgba(0,0,0,.7)}
+.bar div{height:100%;width:0;background:linear-gradient(180deg,var(--hi),var(--deep));box-shadow:0 0 12px rgba(106,61,255,.6);transition:width .3s}
+.small{color:var(--muted);font-size:14px;margin:0}
+
+/* Кнопки-«клавиши»: сплошная нижняя тень, при нажатии вдавливаются */
+button{font:inherit;cursor:pointer;max-width:100%;overflow-wrap:anywhere}
+button:focus-visible{outline:3px solid var(--link);outline-offset:3px}
+nav{margin-top:26px;display:flex;flex-direction:column;gap:14px}
+@media(max-width:760px){nav{flex-direction:row;overflow-x:auto;padding:0 0 10px}}
+nav button{text-align:left;padding:11px 14px;border:2px solid var(--line);border-radius:10px;background:linear-gradient(180deg,#240090,#140050);color:var(--ink);font-size:15px;line-height:1.35;white-space:normal;box-shadow:0 4px 0 var(--edge),inset 0 1px 0 rgba(255,255,255,.08);transition:transform .08s,box-shadow .08s}
+nav button:hover{transform:translateY(-2px);background:linear-gradient(180deg,#4a14e8,var(--wine));box-shadow:0 6px 0 var(--edge)}
+nav button.active{border-color:var(--hi);background:linear-gradient(180deg,var(--hi),var(--deep));font-weight:700;box-shadow:0 4px 0 var(--press),inset 0 1px 0 rgba(255,255,255,.25)}
+nav button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--edge)}
+nav button.done::after{content:" ✓";color:var(--ok);font-weight:800}
+.reset{margin-top:38px}
+
+/* Основная панель */
+main{min-width:0;padding:clamp(20px,3.4vw,48px);border:2px solid var(--line);border-radius:18px;background:linear-gradient(180deg,#150055,#10003f);box-shadow:10px 10px 0 var(--wine),0 24px 50px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.07)}
+@media(max-width:760px){main{padding:20px;box-shadow:5px 5px 0 var(--wine),0 14px 30px rgba(0,0,0,.5)}}
+h2{font-size:40px;line-height:1.1;font-weight:800;letter-spacing:-.01em;margin:0 0 16px;text-shadow:2px 2px 0 var(--deep),4px 4px 0 var(--wine)}
+@media(max-width:760px){h2{font-size:30px}}
+h3{font-size:22px;margin:36px 0 10px;padding-left:12px;border-left:6px solid var(--accent)}
+p,li{max-width:80ch}
+mark{background:var(--wine);color:var(--ink);padding:0 5px;border-radius:3px;box-shadow:2px 2px 0 var(--accent)}
+.toc{background:#070020;border:2px solid var(--line);border-left:8px solid var(--accent);border-radius:12px;padding:14px 22px;box-shadow:inset 0 3px 8px rgba(0,0,0,.55)}
+.toc a{color:var(--link)}
+
+/* Вкладки как крупные клавиши */
+.tabs{display:flex;flex-wrap:wrap;gap:22px;margin:20px 0 34px}
+.tabs button{padding:10px 26px;border:2px solid var(--line);border-radius:12px;background:linear-gradient(180deg,#240090,#140050);color:var(--muted);font-weight:700;box-shadow:0 5px 0 var(--edge);transition:transform .08s,box-shadow .08s}
+.tabs button.on{color:#fff;border-color:var(--hi);background:linear-gradient(180deg,var(--hi),var(--deep));box-shadow:0 5px 0 var(--press)}
+.tabs button:active{transform:translateY(4px);box-shadow:0 1px 0 var(--edge)}
+.prompt{background:#070020;border:2px solid var(--line);border-left:6px solid var(--accent);border-radius:0 12px 12px 0;padding:14px 20px;margin-right:6px;font-style:italic;max-width:80ch;box-shadow:5px 5px 0 var(--wine)}
+
+/* Вопросы теста */
+.q{background:linear-gradient(180deg,#1d0070,#150055);border:2px solid var(--line);border-radius:14px;padding:20px 24px;margin:0 6px 28px 0;box-shadow:6px 6px 0 var(--wine),0 12px 24px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.07)}
+.q p{font-weight:700;margin:0 0 12px}
+.q label,.q .opt{display:block;padding:9px 12px;margin-bottom:4px;border-radius:8px}
+.q label{cursor:pointer}.q label:hover{background:var(--wine)}
+.q input{margin-right:8px;accent-color:var(--accent)}
+.q .ok{color:var(--ok);font-weight:600}.q .bad{color:var(--bad);text-decoration:line-through}
+.q .mk{text-decoration:none}
+.q .why{font-size:15px;color:var(--muted);margin:8px 0 0}
+
+/* Основные и второстепенные кнопки */
+.go{padding:12px 26px;border:0;border-radius:10px;background:linear-gradient(180deg,var(--hi),var(--deep));color:#fff;font-weight:700;box-shadow:0 6px 0 var(--press),0 10px 18px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.25);transition:transform .08s,box-shadow .08s}
+.go:hover{transform:translateY(-2px);box-shadow:0 8px 0 var(--press),0 14px 22px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.25)}
+.alt{background:#0f0040;color:var(--link);border:2px solid var(--accent);box-shadow:0 6px 0 var(--wine),0 10px 18px rgba(0,0,0,.4)}
+.alt:hover{background:var(--wine);box-shadow:0 8px 0 var(--edge),0 14px 22px rgba(0,0,0,.4)}
+.go:active{transform:translateY(5px);box-shadow:0 1px 0 var(--press)}
+.actions{display:flex;flex-wrap:wrap;justify-content:space-between;gap:30px;margin-top:44px;padding-bottom:8px}
+.grp{display:flex;flex-wrap:wrap;gap:24px}
+.msg{font-weight:700;margin:16px 0}
+.sub{max-width:80ch}
+pre{background:#282828;border:2px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;font-size:14px;line-height:1.5;max-width:80ch;box-shadow:inset 0 4px 10px rgba(0,0,0,.6)}
+code,pre{font-family:ui-monospace,Menlo,Consolas,monospace}
+.go{line-height:1.3}
+@media(max-width:760px){nav button{white-space:nowrap;flex:none}}
+/* Логотип над рабочей зоной, в левом верхнем углу */
+.top{max-width:1480px;margin:0 auto;padding:32px 32px 0}
+@media(max-width:760px){.top{padding:22px 14px 0}}
+.brand{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.chip{display:inline-block;padding:6px 12px;border:2px solid var(--hi);border-radius:10px;background:linear-gradient(180deg,var(--hi),var(--deep));color:#fff;font:700 20px ui-monospace,Menlo,Consolas,monospace;transform:rotate(-6deg);box-shadow:0 5px 0 var(--press),0 10px 18px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.25)}
+.word{font-size:clamp(34px,8vw,54px);line-height:1;font-weight:800;letter-spacing:-.02em;text-shadow:2px 2px 0 var(--deep),4px 4px 0 var(--wine),6px 6px 0 var(--edge)}
+.word b{color:var(--link);font-weight:800}
+.tip{background:#070020;border:2px solid var(--line);border-left:6px solid var(--link);border-radius:10px;padding:12px 18px;margin:16px 0;max-width:80ch}
+.sub ul,.sub ol{padding-left:26px}.sub li{margin-bottom:8px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+[hidden]{display:none!important}
+.top{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.top .brand{color:inherit;text-decoration:none}
+.site{margin:0;gap:12px}.site button{padding:8px 18px}
+.wrap{max-width:1480px;margin:0 auto;padding:32px 32px 24px}
+.wrap main{margin:0 10px 36px 0}
+.hero h2{font-size:clamp(30px,5vw,52px)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:26px;margin:18px 0 8px}
+.card{display:block;min-width:0;text-align:left;font:inherit;color:var(--ink);padding:18px 20px;border:2px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#1d0070,#150055);box-shadow:6px 6px 0 var(--wine);overflow-wrap:anywhere}
+.card p{margin:0;font-size:16px}
+.ct{display:block;font-size:18px;font-weight:700;margin-bottom:8px}
+.tag{display:block;font-size:14px;color:var(--muted);margin-top:4px}
+button.card:not(:disabled):hover{border-color:var(--hi)}
+.card:disabled{opacity:.5;cursor:not-allowed}.card.ok{border-color:var(--ok)}
+.lvl{flex:none;margin:6px 0 -6px;align-self:center}
+.navtoggle{display:none}
+.foot{max-width:1480px;margin:0 auto;padding:0 32px 40px}
+@media(max-width:760px){.wrap{padding:20px 14px 16px}.wrap main{margin:0 5px 28px 0}.foot{padding:0 14px 32px}.lvl{margin:0}}
+@media(max-width:760px){
+body{font-size:17px;line-height:1.65;padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.top{padding:14px 14px 0}
+.word{font-size:30px}.chip{font-size:16px;padding:4px 9px}
+.tabs.site{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;gap:6px;flex-wrap:nowrap;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));background:#070020;border-top:2px solid var(--line);box-shadow:0 -8px 24px rgba(0,0,0,.5)}
+.site button{flex:1;min-width:0;min-height:48px;padding:8px 2px;font-size:13px;border-radius:10px;box-shadow:0 3px 0 var(--edge)}
+.tabs{gap:12px;margin:14px 0 22px}
+.tabs button{flex:1;min-height:48px;padding:10px 12px}
+.layout{gap:18px;padding:14px 14px 28px}
+aside{padding:14px}
+aside h1{font-size:22px;margin-bottom:12px;padding-bottom:10px;text-shadow:1px 1px 0 var(--deep)}
+aside h1+p,aside .reset{display:none}
+.bar{margin:12px 0 6px}
+nav{margin-top:14px;gap:10px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+nav button{min-height:46px;scroll-snap-align:start}
+main{padding:16px}
+h2{font-size:26px;text-shadow:1px 1px 0 var(--deep)}
+.hero h2{font-size:28px}
+h3{font-size:19px;margin:26px 0 8px}
+.toc{padding:10px 16px}
+pre{font-size:13px;padding:12px}
+.prompt{margin-right:0;padding:12px 14px}
+.q{padding:14px;margin:0 4px 20px 0}
+.q label{display:flex;align-items:center;gap:10px;min-height:50px;padding:10px}
+.q input{width:22px;height:22px;flex:none;margin:0}
+.actions{gap:14px;margin-top:28px}
+.grp{width:100%;gap:14px}
+.go{width:100%;min-height:50px;padding:12px 18px}
+.grid{gap:14px}
+.card{padding:14px 16px;box-shadow:4px 4px 0 var(--wine)}
+button.card{min-height:64px}
+.navtoggle{display:block;margin-top:12px}
+nav{display:none}
+nav.show{display:flex;flex-direction:column;max-height:55vh;overflow-y:auto;padding:0 4px 10px 0}
+nav.show button{white-space:normal;flex:none;width:100%}
+nav .lvl{margin:8px 0 0}
+}
+
+/* Минималистичный скин */
+::selection{background:#3500D3;color:#fff}
+body{background:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px) 0 0/100% 72px,linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px) 0 0/72px 100%,#000;background-attachment:fixed}
+.top{border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:12px}
+.chip{background:none;border:1px solid #fff;border-radius:0;box-shadow:none;color:#fff}
+.word{font:700 20px 'Roboto Condensed',sans-serif;text-transform:uppercase;letter-spacing:.22em;text-shadow:none}
+.word b{color:#6a3dff}
+h1,h2,h3{overflow-wrap:anywhere}
+h1,h2{font-family:'Roboto Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-weight:700;text-shadow:none}
+h3{font:600 15px 'Roboto Condensed',sans-serif;text-transform:uppercase;letter-spacing:.16em;color:var(--link)}
+main,aside{position:relative;background:rgba(12,0,50,.88);border:1px solid rgba(255,255,255,.18);border-radius:0;box-shadow:none}
+main::before,aside::before{content:'+';position:absolute;top:2px;left:5px;font-size:12px;line-height:1;color:rgba(255,255,255,.6);pointer-events:none}
+main::after,aside::after{content:'+';position:absolute;bottom:2px;right:5px;font-size:12px;line-height:1;color:rgba(255,255,255,.6);pointer-events:none}
+.wrap main{margin:0 0 28px}
+.hero{background:#3500D3;border-color:#3500D3;clip-path:polygon(0 0,100% 0,100% calc(100% - 28px),calc(100% - 28px) 100%,0 100%)}
+.hero .sub,.hero .small{color:#fff}
+.go{background:#3500D3;color:#fff;border:0;border-radius:0;box-shadow:none;text-transform:uppercase;letter-spacing:.12em;font:600 15px 'Roboto Condensed',sans-serif;clip-path:polygon(0 0,100% 0,100% 68%,calc(100% - 14px) 100%,0 100%)}
+.go.alt{background:#282828}
+.hero .go{background:#fff;color:#0C0032}.hero .go.alt{background:#190061;color:#fff}
+.go:hover{background:#6a3dff;color:#fff;transform:none}
+.tabs button{background:none;border:0;border-bottom:1px solid rgba(255,255,255,.25);border-radius:0;box-shadow:none;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font:600 14px 'Roboto Condensed',sans-serif}
+.tabs button.on{background:#3500D3;border-bottom-color:#3500D3;color:#fff}
+nav button{background:transparent;border:0;border-left:2px solid rgba(255,255,255,.2);border-radius:0;box-shadow:none}
+nav button.active{background:#3500D3;border-left-color:#fff}
+nav button.done{border-left-color:var(--ok)}
+nav button:hover:not(:disabled){background:#190061;transform:none}
+nav button.active:hover:not(:disabled){background:#3500D3}
+.card{background:#282828;border:0;border-left:2px solid #3500D3;border-radius:0;box-shadow:none}
+.card.ok{border-left-color:var(--ok)}
+button.card:not(:disabled):hover{background:#190061}
+.ct{font-family:'Roboto Condensed',sans-serif;text-transform:uppercase;letter-spacing:.08em}
+.q{background:rgba(25,0,97,.5);border:1px solid rgba(255,255,255,.15);border-radius:0;box-shadow:none}
+.q label{border-radius:0;box-shadow:none}
+.tip,.prompt,.toc,pre{border-radius:0;box-shadow:none}
+pre{background:#282828}
+.bar{height:6px;background:#282828;border:0;border-radius:0;box-shadow:none}
+.bar div{background:#3500D3;border-radius:0}
+.foot{border-top:1px solid rgba(255,255,255,.15);padding-top:16px}
+
+/* Лёгкий объём */
+main,aside{background:linear-gradient(180deg,rgba(53,0,211,.16),rgba(12,0,50,.92) 45%);box-shadow:10px 10px 0 #190061,inset 0 1px 0 rgba(255,255,255,.1)}
+.wrap main{margin:0 10px 38px 0}
+.hero{background:linear-gradient(135deg,#4a14e8,#3500D3 55%,#2a00a8);box-shadow:none}
+.chip{box-shadow:3px 3px 0 #3500D3}
+.go{background:linear-gradient(180deg,#4311e6,#3500D3);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -3px 0 rgba(0,0,0,.28)}
+.go.alt{background:linear-gradient(180deg,#303030,#282828)}
+.hero .go{background:linear-gradient(180deg,#fff,#e4dcff)}
+.hero .go.alt{background:linear-gradient(180deg,#240090,#190061)}
+.go:hover{background:linear-gradient(180deg,#7a50ff,#6a3dff)}
+.go:active{transform:translateY(1px)}
+.tabs button.on{background:linear-gradient(180deg,#4311e6,#3500D3);box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+nav button.active{background:linear-gradient(180deg,#4311e6,#3500D3);box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.card{background:linear-gradient(180deg,#303030,#282828);box-shadow:4px 4px 0 #000,inset 0 1px 0 rgba(255,255,255,.08);transition:transform .15s}
+button.card:not(:disabled):hover{background:linear-gradient(180deg,#240090,#190061);transform:translate(-1px,-1px)}
+.q{box-shadow:5px 5px 0 #190061;margin-right:5px}
+.tip{box-shadow:4px 4px 0 #190061}
+pre{box-shadow:inset 0 2px 8px rgba(0,0,0,.6)}
+.bar div{box-shadow:0 0 10px rgba(106,61,255,.8)}
+@media(max-width:760px){main,aside{box-shadow:5px 5px 0 #190061,inset 0 1px 0 rgba(255,255,255,.1)}.wrap main{margin:0 5px 30px 0}.card{box-shadow:3px 3px 0 #000,inset 0 1px 0 rgba(255,255,255,.08)}}
+
+/* Мобильное меню-шторка */
+.burger,.scrim{display:none}
+@media(max-width:760px){
+body{padding-bottom:0}
+.burger{display:flex;flex-direction:column;justify-content:center;gap:5px;position:relative;z-index:70;width:46px;height:46px;padding:0 11px;background:#282828;border:1px solid rgba(255,255,255,.25);border-radius:0;box-shadow:3px 3px 0 #3500D3;cursor:pointer;touch-action:manipulation}
+.burger i{display:block;height:2px;background:#fff}
+.scrim{display:block;position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.open{opacity:1;pointer-events:auto}
+.tabs.site{top:0;bottom:0;left:auto;right:0;width:min(250px,78vw);flex-direction:column;flex-wrap:nowrap;gap:10px;padding:calc(72px + env(safe-area-inset-top,0px)) 16px 20px;background:#0C0032;border-top:0;border-left:1px solid rgba(255,255,255,.2);box-shadow:-8px 0 0 #190061,-20px 0 40px rgba(0,0,0,.6);transform:translateX(calc(100% + 30px));visibility:hidden;transition:transform .25s,visibility .25s;z-index:60}
+.tabs.site.open{transform:none;visibility:visible}
+.site button{flex:none;width:100%;min-height:52px;padding:12px 16px;text-align:left;font-size:16px;border-left:2px solid rgba(255,255,255,.25)}
+.site button.on{border-left-color:#fff}
+}
+
+/* Песочница */
+.ex-row{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.ex{min-height:40px;padding:8px 14px;background:#282828;color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:0;font:600 14px 'Roboto Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;touch-action:manipulation}
+.ex:hover{background:#240090}
+.labin{display:block;width:100%;min-height:96px;resize:vertical;padding:12px 14px;background:#08001f;color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:0;font:inherit;font-size:16px;box-shadow:inset 0 2px 8px rgba(0,0,0,.6)}
+.labin:focus{outline:2px solid #6a3dff}
+.labframe{display:block;width:100%;height:420px;margin-top:14px;background:#fff;border:1px solid rgba(255,255,255,.25);border-radius:0}
+.labcode{margin-top:16px}
+.labcode summary{cursor:pointer;color:var(--link);font:600 14px 'Roboto Condensed',sans-serif;letter-spacing:.12em;text-transform:uppercase}
+.labcode pre{max-height:360px;overflow:auto}
+.go:disabled{opacity:.5;cursor:wait}
+@media(max-width:760px){.tabs:not(.site) button{padding:10px 4px;font-size:13px}.labframe{height:360px}}
+.labsel{width:auto;max-width:100%;min-height:0;padding:8px 12px;margin:6px 0 12px;resize:none;font-size:15px}
+.mgrid{margin:10px 0 18px}
+.mgrid .card{cursor:pointer}
+.card.sel{border-left-color:#fff;background:linear-gradient(180deg,#240090,#190061)}
+.modh{font:700 26px/1.2 'Roboto Condensed',sans-serif;letter-spacing:.06em;color:#fff;text-transform:uppercase;margin:38px 0 4px;padding-left:14px;border-left:4px solid #3500D3}
+.mod{flex:none;align-self:stretch;margin:6px 0 0;padding:8px 12px;border-left:3px solid #3500D3;background:rgba(53,0,211,.18);color:#fff;font:700 14px 'Roboto Condensed',sans-serif;letter-spacing:.12em;text-transform:uppercase}
+nav button.emod{font-size:15px}
+@media(max-width:760px){.modh{font-size:22px}}
+@media(min-width:761px){.top{padding-top:22px;padding-bottom:18px}.chip{font-size:26px;padding:8px 16px}.word{font-size:32px;letter-spacing:.16em}.site{gap:16px}.site button{padding:13px 28px;font-size:18px}}
+@media(min-width:761px){.hero .actions{gap:22px;margin-top:34px}.hero .go{min-height:64px;padding:18px 44px;font-size:21px;letter-spacing:.14em;clip-path:polygon(0 0,100% 0,100% 66%,calc(100% - 20px) 100%,0 100%)}}
+.chip{display:inline-block;transition:transform .14s ease-out,box-shadow .14s ease-out;will-change:transform}
+.word{background:linear-gradient(90deg,#ffffff,#b9a6ff,#6a3dff,#b9a6ff,#ffffff);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;animation:wordflow 5s linear infinite}
+.word b{color:inherit;-webkit-text-fill-color:transparent}
+@keyframes wordflow{to{background-position:200% 0}}
+@media(prefers-reduced-motion:reduce){.word{animation:none}}
+body{background:#000}
+#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas><header class="top"><a href="#" class="brand" onclick="go('home');return false"><span class="chip">&lt;/&gt;</span><span class="word">Vibe<b>Guide</b></span></a><div class="tabs site" id="site"></div><button class="burger" aria-label="Меню" onclick="toggleMenu()"><i></i><i></i><i></i></button><div class="scrim" id="scrim" onclick="closeMenu()"></div></header>
+<div class="wrap" id="pages"></div>
+<div class="layout" id="lesson" hidden>
+  <aside>
+    <h1>Вайбкодинг с нуля</h1>
+    <p class="small">Прочитайте раздел, затем перейдите на вкладку «Тест». Следующий раздел открывается после зачёта.</p>
+    <div class="bar"><div id="barFill"></div></div>
+    <p class="small" id="barText"></p>
+    <button class="go alt navtoggle" onclick="document.getElementById('nav').classList.toggle('show')">Все разделы</button><nav id="nav"></nav>
+    <button class="go alt reset" onclick="resetAll()">Сбросить результаты</button>
+  </aside>
+  <main id="content"></main>
+</div>
+<footer class="foot small">VibeGuide — учебный курс по вайбкодингу. Результаты сохраняются только в вашем браузере.</footer>
+<script>
+const sections = [
+{ title:"Основы", subs:[
+ [`Что такое вайбкодинг`,`<p><mark>Вайбкодинг</mark> (от англ. vibe — «ощущение, настроение») — это способ создавать программы, когда вы описываете задачу обычными словами, а <mark>код пишет искусственный интеллект</mark>. Термин ввёл в обиход исследователь Андрей Карпаты в начале 2025 года.</p><div class='tip'><b>Простыми словами:</b> это как заказ в ресторане. Вы говорите, что хотите, а блюдо готовит повар. Готовить самому не обязательно, но нужно понимать, что вы заказали, и уметь оценить результат.</div>`],
+ [`Азбука: из чего состоит сайт`,`<p>Чтобы понимать, что вам выдаёт ИИ, полезно знать три «слоя» любой страницы:</p><ul><li><b>HTML</b> — каркас и содержание: заголовки, абзацы, кнопки. Это «скелет».</li><li><b>CSS</b> — внешний вид: цвета, шрифты, отступы. Это «одежда».</li><li><b>JavaScript</b> — поведение: что происходит при нажатии кнопки, подсчёты, проверка ответов. Это «мозг».</li></ul><p>Всё это можно записать в один файл с расширением <code>.html</code> и открыть двойным щелчком в браузере. Именно так устроен этот сайт.</p>`],
+ [`Как ИИ пишет код`,`<p>ИИ-ассистент — это <mark>языковая модель</mark>: программа, обученная на огромном количестве текстов и кода. Она не «понимает» задачу как человек, а подбирает наиболее вероятное продолжение текста. Поэтому ответы звучат уверенно, но иногда бывают неверными: модель может <mark>выдумать</mark> несуществующую функцию или перепутать формулу.</p><div class='tip'><b>Запомните:</b> «уверенно» не значит «правильно». Результат нужно запускать и проверять.</div>`],
+ [`Рабочий цикл на примере`,`<p>Работа идёт кругами: <mark>запрос → код → запуск → проверка → уточнение</mark>. Пример:</p><ol><li>Вы пишете: «Сделай страницу с кнопкой, которая меняет цвет фона».</li><li>ИИ выдаёт код. Вы сохраняете его в файл <code>index.html</code> и открываете в браузере.</li><li>Нажимаете кнопку, а цвет не меняется. Значит, нужна правка.</li><li>Вы пишете: «Кнопка ничего не делает, исправь».</li></ol><p>Каждый круг приближает результат к задуманному.</p>`],
+ [`Роль человека`,`<p>ИИ ускоряет работу, но ответственность остаётся за вами. Человек:</p><ul><li>ставит задачу и объясняет, что нужно;</li><li>запускает и проверяет результат;</li><li>решает, что оставить, а что переделать;</li><li>отвечает за итог перед преподавателем, заказчиком и пользователями.</li></ul>`],
+ [`Мини-словарь`,`<ul><li><b>Промпт</b> — ваш запрос к ИИ.</li><li><b>Код</b> — инструкции для компьютера на языке программирования.</li><li><b>Браузер</b> — программа для просмотра сайтов (Chrome, Firefox, Safari).</li><li><b>Баг</b> — ошибка в программе.</li><li><b>Отладка</b> — поиск и исправление ошибок.</li><li><b>Консоль</b> — окно браузера, где программа пишет сообщения об ошибках.</li></ul>`]],
+ quiz:[
+ {q:"Что такое вайбкодинг?",o:["Создание программ через описание задачи словами","Ручное написание каждой строки","Копирование чужих сайтов"],why:"ИИ пишет код по вашему описанию."},
+ {q:"Какой порядок работы верный?",o:["Запрос → код → запуск → проверка → уточнение","Публикация → запрос → код","Код → удаление → запрос"],why:"Работа идёт циклами."},
+ {q:"Кто отвечает за результат проекта?",o:["Человек","Только ИИ","Разработчик сервиса"],why:"Ответственность остаётся за автором проекта."},
+ {q:"Почему результат работы ИИ нужно проверять?",o:["Он может уверенно выдумывать несуществующее","Он всегда ошибается","Он не знает языков"],why:"Модель предсказывает вероятное продолжение, а не гарантирует истину."},
+ {q:"Какая часть сайта отвечает за внешний вид: цвета и отступы?",o:["CSS","HTML","Браузер"],why:"HTML — содержание, CSS — оформление, JavaScript — поведение."}]},
+
+{ title:"Инструменты", subs:[
+ [`Чат-ассистенты`,`<p>Самый простой старт: вы открываете чат с ИИ (например, Claude), описываете задачу и получаете готовый код. Дальше его нужно <mark>скопировать в файл</mark>, сохранить и открыть в браузере.</p><p>Плюс: ничего не нужно устанавливать. Минус: код вы переносите вручную, а ИИ не видит остальные файлы проекта.</p>`],
+ [`ИИ-редакторы и агенты`,`<p>Это программы, где ИИ встроен в среду разработки. Редакторы с ИИ (например, Cursor) подсказывают код по ходу работы. <mark>Агенты</mark> (например, Claude Code) сами создают и меняют файлы проекта, запускают команды и показывают результат.</p><p>Они удобны для больших проектов, но требуют внимания: агент может изменить много файлов сразу, поэтому важно смотреть, что именно изменилось.</p>`],
+ [`Как выбрать`,`<ul><li>Один учебный сайт или небольшой скрипт — хватит чата и одного HTML-файла.</li><li>Проект из нескольких файлов — редактор или агент.</li><li>Вы только учитесь — начните с чата: так проще видеть каждый шаг.</li></ul><div class='tip'>Любой инструмент подойдёт, если вы понимаете, что он делает.</div>`]],
+ quiz:[
+ {q:"Что подойдёт для простого учебного сайта?",o:["Чат и один HTML-файл","Только ручной код на C++","Ничего не нужно"],why:"Небольшая задача решается простыми средствами."},
+ {q:"Чем агент отличается от чата?",o:["Сам создаёт и меняет файлы проекта","Не умеет работать с кодом","Работает только офлайн"],why:"Агент работает прямо с файлами."},
+ {q:"С чего удобно начинать новичку?",o:["С чат-ассистента","С самого сложного инструмента","С отказа от ИИ"],why:"Чат — самый простой вход."}]},
+
+{ title:"Запросы (промпты)", subs:[
+ [`Зачем нужен хороший запрос`,`<p>ИИ не читает мысли. Если запрос расплывчатый, он «додумает» недостающее сам, и результат может не совпасть с вашей идеей. Чем точнее запрос, тем меньше правок потом.</p>`],
+ [`Структура запроса`,`<p>Хороший запрос отвечает на три вопроса: <mark>что</mark> сделать, <mark>для кого</mark> и <mark>с какими ограничениями</mark>.</p><p>Плохо: «Сделай калькулятор».</p><p class='prompt'>Хорошо: «Калькулятор на HTML и JavaScript в одном файле, четыре действия, без библиотек, комментарии на русском».</p>`],
+ [`Контекст и примеры`,`<p>Дайте ИИ контекст: уже написанный код, формат данных, нужный стиль. Если важен точный результат, покажите <mark>пример входа и выхода</mark>: «если ввести 2 и 3, должно получиться 5».</p>`],
+ [`Шпаргалка`,`<ul><li>Называйте язык и технологии.</li><li>Просите простой код с комментариями.</li><li>Делите большую задачу на шаги.</li><li>Пишите, чего не нужно (например, «без библиотек»).</li><li>Если ответ не подошёл, уточняйте, а не начинайте с нуля.</li></ul>`]],
+ quiz:[
+ {q:"Какой запрос лучше?",o:["Калькулятор на HTML и JS, один файл, без библиотек","Сделай калькулятор","Сделай что-нибудь"],why:"Здесь есть технологии и ограничения."},
+ {q:"Зачем просить простой код?",o:["Его проще понять и объяснить","Он всегда быстрее","Так положено"],why:"Понятный код легче проверить."},
+ {q:"Как поступить с большой задачей?",o:["Разбить на маленькие шаги","Отправить одним огромным запросом","Не ставить её"],why:"Малые шаги дают предсказуемый результат."}]},
+
+{ title:"Планирование проекта", subs:[
+ [`Зачем планировать`,`<p>Если сразу попросить «сделай сайт», ИИ примет много решений за вас, и итог будет случайным. Короткий план за пять минут экономит часы правок.</p>`],
+ [`Мини-задание`,`<p>Запишите три вещи: <mark>цель</mark> (зачем проект), <mark>пользователь</mark> (кто им будет пользоваться), <mark>функции</mark> (что он должен уметь).</p><div class='tip'><b>Пример для этого сайта:</b> цель — научить основам вайбкодинга; пользователь — новичок; функции — разделы теории и тесты.</div>`],
+ [`Разбиение на шаги`,`<ol><li>Каркас страницы (HTML).</li><li>Оформление (CSS).</li><li>Поведение (JavaScript).</li></ol><p>После каждого шага проверяйте результат. Лишних функций не добавляйте: их сложнее объяснить и проверить.</p>`]],
+ quiz:[
+ {q:"Что стоит сделать до первых запросов?",o:["Записать цель, пользователя и функции","Сразу публиковать","Выбрать цвет кнопки"],why:"Мини-ТЗ делает запросы точнее."},
+ {q:"Какой порядок шагов разумен?",o:["Каркас → оформление → поведение","Поведение → каркас → ничего","Оформление → публикация"],why:"Сначала основа, потом детали."},
+ {q:"Почему лишние функции вредны?",o:["Их сложнее объяснить и проверить","Они запрещены","Они замедляют интернет"],why:"Простой проект легче защитить."}]},
+
+{ title:"Отладка и итерации", subs:[
+ [`Какие бывают ошибки`,`<p><b>Явные</b> ошибки ломают программу и выводят сообщение. <b>Скрытые</b> (логические) не мешают запуску, но результат неверный, например 53 вместо 8. Вторые опаснее: их не видно сразу.</p>`],
+ [`Где смотреть сообщения`,`<p>Откройте консоль браузера: клавиша <code>F12</code>, вкладка «Console». Красные строки — ошибки. Скопируйте текст целиком и отправьте ИИ вместе с кодом, а также опишите, что вы ожидали и что получилось.</p>`],
+ [`Одна правка за раз`,`<p>Если просить пять правок сразу, непонятно, какая что-то сломала. Меняйте по одной вещи и проверяйте результат.</p>`],
+ [`Версии`,`<p>Перед крупным изменением сохраните рабочую копию файла (например, <code>index-v1.html</code>). Если что-то пойдёт не так, вы вернётесь к рабочей версии.</p>`]],
+ quiz:[
+ {q:"Что отправить ИИ при ошибке?",o:["Текст ошибки и код","Слово «не работает»","Ничего"],why:"Контекст помогает найти причину."},
+ {q:"Почему лучше одна правка за раз?",o:["Видно, какая правка всё сломала","ИИ не умеет иначе","Это быстрее для интернета"],why:"Малые шаги легко проверять."},
+ {q:"Зачем сохранять рабочую копию?",o:["Чтобы вернуться при неудаче","Для красоты","Чтобы увеличить размер проекта"],why:"Копия — страховка."}]},
+
+{ title:"Безопасность и этика", subs:[
+ [`Секреты`,`<p>Пароли, API-ключи и токены — это «ключи от дома». Их нельзя вставлять в запросы к ИИ и публиковать в открытом коде: любой, кто их увидит, сможет пользоваться вашим аккаунтом.</p>`],
+ [`Проверка кода`,`<p>Код, который запустился без ошибок, может <mark>считать неверно</mark>. Проверяйте на примерах с известным ответом и на «неудобных» значениях: пустое поле, ноль, отрицательное число.</p>`],
+ [`Приватность и лицензии`,`<p>Не отправляйте ИИ чужие персональные данные и закрытый код компании. Ответы могут быть похожи на открытые проекты, поэтому читайте условия лицензий и самого сервиса.</p>`],
+ [`Честность`,`<p>Указывайте, что использовали ИИ, и будьте готовы объяснить каждый фрагмент своими словами. Если не можете, попросите ИИ разобрать код построчно простыми словами.</p>`]],
+ quiz:[
+ {q:"Можно ли отправлять ИИ пароли и ключи?",o:["Нет, секреты нужно беречь","Да, это безопасно","Только по выходным"],why:"Секреты могут утечь."},
+ {q:"Если код запустился без ошибок, он…",o:["Может всё равно считать неверно","Точно правильный","Безопасен"],why:"Ошибки логики видно только при проверке."},
+ {q:"Что важно на защите проекта?",o:["Объяснить каждый фрагмент кода","Иметь много кода","Скрыть использование ИИ"],why:"Понимание показывает, что проект ваш."}]},
+
+{ title:`Практика: список дел`, subs:[
+ [`Задача и запрос`,`Реальный пример: приложение «Список дел», где можно добавлять и удалять задачи.<p class='prompt'>«Сделай список дел на HTML и JavaScript в одном файле: поле ввода, кнопка „Добавить“, список задач, у каждой задачи кнопка „Удалить“. Без библиотек, с комментариями на русском.»</p>Здесь названы технологии, элементы интерфейса и ограничения.`],
+ [`Что вернёт ИИ`,`Суть решения — массив задач и функция, которая перерисовывает список:<pre>let tasks = [];
+function add(text) {
+  tasks.push(text);    // добавили в массив
+  draw();              // перерисовали список
+}
+function remove(i) {
+  tasks.splice(i, 1);  // убрали одну задачу
+  draw();
+}</pre>Принцип «данные в массиве, экран рисуется из них» тот же, что на этом сайте.`],
+ [`Улучшаем по шагам`,`Делайте по одной правке: сначала «сохраняй задачи, чтобы они не пропадали после перезагрузки» (<mark>localStorage</mark>), затем «добавь отметку выполнено». После каждой проверяйте: добавьте задачу, обновите страницу, удалите её.`]],
+ quiz:[
+ {q:`Что хранит массив tasks в примере?`,o:[`Список задач, из которого рисуется экран`,`Цвета страницы`,`Пароли пользователей`],why:`Экран строится из данных массива.`},
+ {q:`Что делает tasks.splice(i, 1)?`,o:[`Удаляет одну задачу с номером i`,`Добавляет задачу`,`Очищает страницу`],why:`splice вырезает элементы массива.`},
+ {q:`Как сделать, чтобы задачи не пропадали после перезагрузки?`,o:[`Сохранять их в localStorage`,`Не обновлять страницу`,`Добавить больше цветов`],why:`localStorage хранит данные в браузере.`}]},
+
+{ title:`Практика: калькулятор ИМТ`, subs:[
+ [`Формула и запрос`,`Индекс массы тела: <mark>вес (кг) ÷ рост (м)²</mark>.<p class='prompt'>«Сделай форму с полями „вес“ и „рост в см“, кнопкой „Рассчитать“ и выводом ИМТ с одним знаком после запятой.»</p>В запросе явно указаны сантиметры: иначе ИИ может принять рост за метры.`],
+ [`Проверка на известном примере`,`Не верьте коду на слово. Проверьте пример с известным ответом: 70 кг и 175 см дают 70 ÷ 1,75² ≈ <mark>22,9</mark>. Если на экране другое число, ищите ошибку — часто это забытый перевод сантиметров в метры.`],
+ [`Граничные случаи`,`Проверьте «неудобные» значения: пустое поле, ноль, отрицательное число.<p class='prompt'>«Добавь проверку: если значение пустое или не больше нуля, покажи сообщение вместо результата.»</p>`]],
+ quiz:[
+ {q:`ИМТ для 70 кг и 175 см примерно равен…`,o:[`22,9`,`40,0`,`2,3`],why:`70 ÷ (1,75 × 1,75) ≈ 22,9.`},
+ {q:`Почему в запросе указали сантиметры?`,o:[`Чтобы ИИ не перепутал единицы измерения`,`Для красоты`,`Так требует формула`],why:`Неверные единицы дают неверный результат.`},
+ {q:`Какие значения стоит проверить, кроме обычных?`,o:[`Пустое поле, ноль и отрицательные числа`,`Только красивые числа`,`Ничего, если всё работает`],why:`Ошибки часто прячутся на границах.`}]},
+
+{ title:`Практика: поиск ошибки`, subs:[
+ [`Симптом`,`Реальный случай: калькулятор вместо 5 + 3 выводит <mark>53</mark>. Код выглядит правильно, ошибок в консоли нет — поэтому такие баги коварны.`],
+ [`Причина`,`Значение поля ввода в JavaScript — всегда <mark>строка</mark>, а оператор + склеивает строки:<pre>let a = input1.value;   // '5'
+let b = input2.value;   // '3'
+console.log(a + b);     // '53', а не 8</pre>`],
+ [`Исправление`,`Преобразуйте строки в числа:<pre>let sum = Number(a) + Number(b);   // 8</pre>Хороший запрос к ИИ:<p class='prompt'>«При сложении получается 53 вместо 8. Вот код: … Объясни причину и исправь одной строкой.»</p>`]],
+ quiz:[
+ {q:`Почему 5 + 3 даёт 53?`,o:[`Значения полей — строки, и + склеивает их`,`Компьютер не умеет считать`,`Сломан браузер`],why:`value возвращает строку.`},
+ {q:`Как исправить эту ошибку?`,o:[`Преобразовать значения через Number()`,`Удалить кнопку`,`Перезагрузить страницу`],why:`Number превращает строку в число.`},
+ {q:`Что приложить к запросу об ошибке?`,o:[`Код, ожидаемый и полученный результат`,`Только слово «ошибка»`,`Фото рабочего стола`],why:`Чем точнее описание, тем точнее исправление.`}]},
+
+{ title:`Практика: страница-визитка`, subs:[
+ [`Запрос`,`Задача: страница о себе для портфолио. Указывайте содержание, а не просто «красиво».<p class='prompt'>«Одностраничная визитка на HTML и CSS: имя, короткое описание, три проекта списком, контакты. Тёмная и светлая темы, адаптивная вёрстка для телефона, без библиотек.»</p>`],
+ [`Адаптивность`,`Страница должна читаться на телефоне. Ключевое: тег <code>viewport</code> и гибкая сетка. Сузьте окно браузера: текст не должен обрезаться, а блоки — вылезать за экран.`],
+ [`Доступность`,`Проверьте контраст текста и фона и то, что страницу можно листать клавишей Tab. Это быстро и сразу улучшает проект.`]],
+ quiz:[
+ {q:`Что делает страницу удобной на телефоне?`,o:[`Адаптивная вёрстка и тег viewport`,`Больше картинок`,`Большой размер файла`],why:`Они подстраивают страницу под ширину экрана.`},
+ {q:`Как быстро проверить адаптивность?`,o:[`Сузить окно браузера`,`Перечитать код`,`Перезагрузить компьютер`],why:`Так видно, как страница ведёт себя на узком экране.`},
+ {q:`Что указать в запросе вместо «сделай красиво»?`,o:[`Содержание, темы и ограничения`,`Ничего`,`Только цвет`],why:`Конкретика даёт предсказуемый результат.`}]}
+];
+
+const meta=[
+{n:"ничего знать заранее не нужно, это первый шаг.",
+ x:"Вы просите ИИ: «Сделай страницу с надписью Привет». Он присылает три части: HTML (надпись), CSS (цвет) и JavaScript (пока пусто). Вы сохраняете код в файл hello.html и открываете в браузере. Писать код самому не пришлось, но вы поняли, из чего состоит ответ, а значит, можете его проверить.",
+ r:"Вы знаете, что такое вайбкодинг и почему результат нужно проверять. Дальше выберем, где вести разговор с ИИ."},
+{n:"цикл «запрос → код → запуск → проверка → уточнение» из раздела «Основы».",
+ x:"Задача: страница с таймером. В чате вы получите код и сами сохраните его в файл. Агент сам создаст timer.html, откроет его и покажет результат. Цикл один и тот же, различается лишь то, кто переносит файлы.",
+ r:"Вы умеете выбирать инструмент под задачу. Дальше научимся главному: формулировать запрос так, чтобы не переделывать результат."},
+{n:"цикл работы и выбранный инструмент из прошлых разделов.",
+ x:"Было: «Сделай игру». Стало: «Игра „Угадай число“ на HTML и JavaScript в одном файле: число от 1 до 10, подсказки „больше“ и „меньше“, счётчик попыток, без библиотек». Теперь ИИ знает, что делать и чего не делать, и первая версия почти сразу работает.",
+ r:"Вы умеете составлять точный запрос. Но большой проект одним запросом не сделать: ему нужен план. Он в следующем разделе."},
+{n:"структура запроса из раздела «Запросы»: что, для кого, с какими ограничениями.",
+ x:"Проект «Список книг». Цель: помнить, что уже прочитано. Пользователь: школьник. Функции: добавить книгу и отметить прочитанной. Шаги: каркас, оформление, кнопки. На каждый шаг пишется свой короткий запрос по схеме из прошлого раздела.",
+ r:"План и запросы готовы. Но первая версия почти всегда с ошибками, и сейчас научимся их находить."},
+{n:"точные запросы и пошаговый план: по ним вы быстро поймёте, на каком шаге появилась ошибка.",
+ x:"Кнопка «Добавить» ничего не делает. Шаг 1: нажимаем F12 и читаем консоль: «addBook is not defined». Шаг 2: отправляем ИИ текст ошибки и код. Шаг 3: ИИ находит опечатку в названии функции. Шаг 4: правим одну строку и проверяем.",
+ r:"Вы умеете искать и исправлять ошибки. Остался важный вопрос: что нельзя отдавать ИИ и как не навредить себе и другим."},
+{n:"привычка проверять результат из раздела «Отладка и итерации».",
+ x:"Вы делаете сайт с отправкой писем и спрашиваете ИИ, куда вставить пароль от почты. Правильно: хранить пароль вне кода и не публиковать его. Если пароль попал в чат или в открытый код, его нужно сразу поменять.",
+ r:"Теперь у вас есть весь набор: запросы, план, отладка и безопасность. Следующий уровень посвящён настоящим проектам."},
+{n:"все умения второго уровня: план, точный запрос, проверка по шагам.",
+ x:"Проверяем по шагам. Добавили задачу «Купить хлеб»: появилась в списке. Обновили страницу: пропала, значит, нужен localStorage. Удалили задачу: исчезла. Каждый шаг плана проверяется отдельно.",
+ r:"Вы освоили идею «данные лежат в массиве, экран рисуется из них». В калькуляторе данные приходят из полей ввода."},
+{n:"идея из «Списка дел»: данные берём из элементов страницы и выводим на экран.",
+ x:"Таблица проверки. 70 кг и 175 см: должно получиться 22,9. Пустое поле: сообщение об ошибке. Ноль: сообщение об ошибке. Если одна строка не сошлась, отправьте ИИ именно её вместе с кодом.",
+ r:"Вы умеете проверять расчёты по известному ответу. Теперь разберём коварную ошибку, которая встречается именно в расчётах."},
+{n:"числа из полей ввода («Калькулятор ИМТ») и консоль браузера («Отладка и итерации»).",
+ x:"Тот же приём работает для ИМТ. Если рост 175 даёт результат 0,002, значит, сантиметры не переведены в метры. Любой странный результат повод проверить типы данных и единицы измерения.",
+ r:"Вы умеете находить скрытые ошибки. В финальном проекте соберём все навыки вместе."},
+{n:"итоговый проект: он объединяет запросы, план, проверку и безопасность.",
+ x:"План визитки. Шаг 1: каркас с именем, описанием и проектами. Шаг 2: оформление и две темы. Шаг 3: адаптивность. Шаг 4: проверка: сужаем окно и листаем клавишей Tab. Каждый шаг это отдельный запрос и отдельная проверка.",
+ r:"Вы прошли путь от идеи до готового проекта. Теперь можно придумать собственный и повторить тот же путь."}];
+sections.forEach((s,i)=>{const m=meta[i];
+ s.subs.unshift(["Что понадобится",`<div class='tip'><b>Опираемся на прошлое:</b> ${m.n}</div>`]);
+ s.subs.push(["Разбор на примере",`<p>${m.x}</p>`],["Итог и что дальше",`<p>${m.r}</p>`]);});
+const MOD1={t:'Вайбкодинг с нуля',d:'От первого запроса до готового проекта: три уровня и десять разделов.'};
+const emptyMods=['Модуль 2','Модуль 3','Модуль 4'];
+const levels=[
+{t:"Уровень 1. Старт",d:"Понять, что такое вайбкодинг, и выбрать инструмент.",ids:[0,1]},
+{t:"Уровень 2. Мастерство",d:"Составлять запросы, планировать, искать ошибки и беречь данные.",ids:[2,3,4,5]},
+{t:"Уровень 3. Проекты",d:"Применить всё на четырёх настоящих проектах.",ids:[6,7,8,9]}];
+
+let cur=0,tab="read",qs=[],page="home";
+const quizzes={};
+function load(){try{return JSON.parse(localStorage.getItem('vibe'))||{};}catch(e){return {};}}
+function save(){try{localStorage.setItem('vibe',JSON.stringify({scores,best}));}catch(e){}}
+const saved=load(),scores=saved.scores||{},best=saved.best||{};
+const content=document.getElementById("content"),$=id=>document.getElementById(id);
+/* Вкладка «Материал»: оглавление + подразделы */
+function readView(s){
+  const toc = s.subs.map((x,k)=>`<li><a href="#sub${k}">${x[0]}</a></li>`).join("");
+  const body = s.subs.map((x,k)=>`<h3 id="sub${k}">${cur+1}.${k+1} ${x[0]}</h3><div class='sub'>${x[1]}</div>`).join("");
+  return `<div class="toc"><b>В этом разделе:</b><ul>${toc}</ul></div>${body}
+    <div class="actions"><button class="go" onclick="setTab('quiz')">Перейти к тесту</button></div>`;
+}
+
+/* ===== 5. ТЕСТ: вопросы и варианты перемешиваются при каждом запуске ===== */
+function startQuiz(){
+  tab = "quiz";
+  qs = quizzes[cur] = shuffle(sections[cur].quiz).map(q => ({
+    q: q.q, why: q.why, pick: null,
+    opts: shuffle(q.o.map((t,k) => ({t, ok: k===0})))   // o[0] — правильный
+  }));
+}
+
+function quizView(){
+  const fin = qs.finished, rev = qs.revealed;   // fin: тест проверен, rev: правильные ответы показаны
+  const right = qs.filter(q => q.good).length;  // q.good — оценка на момент последней проверки
+  const mark = q => !fin ? "" : (q.good ? " ✓" : " ✗");
+  let h = qs.map((q,i) => `<div class="q"><p>${i+1}. ${q.q}<span class="${q.good?'ok':'bad'} mk">${mark(q)}</span></p>` + q.opts.map((o,k) => {
+    if (rev) return `<span class="opt ${o.ok?'ok':(q.pick===k?'bad':'')}">${o.ok?'✓ ':''}${o.t}</span>`;
+    return `<label><input type="radio" name="q${i}" value="${k}" ${q.pick===k?'checked':''} onchange="qs[${i}].pick=${k}"> ${o.t}</label>`;
+  }).join("") + ((rev || (fin && q.good)) ? `<p class="why">${q.why}</p>` : "") + "</div>").join("");
+  if (!fin) return h + `<div class="msg" id="msg"></div><div class="actions"><button class="go" onclick="finish()">Завершить тест</button></div>`;
+  const status = scores[cur] ? "Раздел зачтён." : "Пока не зачтено — исправьте ошибки или перечитайте материал.";
+  const hint = rev ? "" : `<p class="small">Отметкой ✗ помечены неверные ответы. Измените их и нажмите «Проверить исправления» — результат пересчитается.</p>`;
+  const first = rev ? "" : `<button class="go" onclick="finish()">Проверить исправления</button><button class="go alt" onclick="reveal()">Показать правильные ответы</button>`;
+  return `<div class="msg" id="msg">Результат: ${right} из ${qs.length}. ${status}</div>` + hint + h +
+    `<div class="actions"><div class="grp">${first}</div><div class="grp"><button class="go alt" onclick="startQuiz();render()">Пройти заново</button><button class="go alt" onclick="setTab('read')">К материалу</button>${scores[cur]?(cur<sections.length-1?`<button class="go" onclick="openSection(${cur+1})">Следующий раздел</button>`:`<button class="go" onclick="go('progress')">К итогам</button>`):""}</div></div>`;
+}
+
+/* Показать правильные ответы: сначала учитываем последние исправления, потом блокируем тест */
+function reveal(){ finish(); if (qs.finished) { qs.revealed = true; render(); } }
+
+function finish(){
+  /* Запоминаем выбор и проверяем, что на все вопросы есть ответ */
+  qs.forEach((q,i) => { const c = document.querySelector(`input[name=q${i}]:checked`); q.pick = c ? Number(c.value) : null; });
+  if (qs.some(q => q.pick === null)) { $("msg").textContent = "Ответьте на все вопросы."; return; }
+  qs.finished = true;
+  qs.forEach(q => q.good = q.opts[q.pick].ok);   // запоминаем оценку каждого ответа
+  const right = qs.filter(q => q.opts[q.pick].ok).length;
+  const pass = right/qs.length >= 0.66;           // зачёт: не меньше 66%
+  scores[cur] = scores[cur] || pass; best[cur] = Math.max(best[cur] || 0, right); save();              // однажды зачтённый раздел остаётся зачтённым
+  render(); window.scrollTo(0,0);
+}
+
+
+const shuffle=a=>[...a].sort(()=>Math.random()-0.5);
+const unlocked=i=>i===0||!!scores[i-1];
+const doneCount=()=>Object.values(scores).filter(Boolean).length;
+const nextOpen=()=>Math.max(0,sections.findIndex((_,k)=>!scores[k]));
+
+function renderNav(){
+ $("nav").innerHTML=`<p class="small mod">Модуль 1. ${MOD1.t}</p>`+levels.map(l=>`<p class="small lvl">${l.t}</p>`+l.ids.map(i=>{const s=sections[i],u=unlocked(i);
+  return `<button ${u?"":"disabled"} class="${i===cur?"active":""} ${scores[i]?"done":""}" onclick="openSection(${i})">${u?"":"🔒 "}${i+1}. ${s.title}${i in best?` (${best[i]}/${s.quiz.length})`:""}</button>`;}).join("")).join("");
+ const n=doneCount();$("barFill").style.width=n/sections.length*100+"%";$("barText").textContent=`Зачтено тестов: ${n} из ${sections.length}`;
+}
+function render(){
+ const s=sections[cur];
+ let h=`<h2>${s.title}</h2><div class="tabs"><button class="${tab==="read"?"on":""}" onclick="setTab('read')">Материал</button><button class="${tab==="quiz"?"on":""}" onclick="setTab('quiz')">Тест</button><button class="${tab==="lab"?"on":""}" onclick="setTab('lab')">Песочница</button></div>`;
+ h+=tab==="read"?readView(s)+labCta():tab==="lab"?labView(true):quizView();
+ content.innerHTML=h;renderNav();if(tab==="lab")wireLab();
+}
+function setTab(t){tab=t;if(t==="quiz"){if(quizzes[cur])qs=quizzes[cur];else startQuiz();}render();window.scrollTo(0,0);}
+function openSection(i){if(!unlocked(i))return;$("nav").classList.remove("show");cur=i;tab="read";page="lesson";show();window.scrollTo(0,0);}
+const lab={prompt:'',code:'',msg:'',busy:false,model:'Qwen2.5-Coder-3B-Instruct-q4f16_1-MLC'};
+const labModels=[
+['Qwen2.5-Coder-1.5B-Instruct-q4f16_1-MLC','Быстрая','1.5B, около 1 ГБ','Запускается почти на любом устройстве, но часто ошибается. Подойдёт для самых простых задач: надпись, кнопка, смена цвета.'],
+['Qwen2.5-Coder-3B-Instruct-q4f16_1-MLC','Сбалансированная','3B, около 2 ГБ','Хороший выбор по умолчанию. Справляется с простыми программами вроде калькулятора или списка дел.'],
+['Qwen2.5-Coder-7B-Instruct-q4f16_1-MLC','Мощная','7B, около 5 ГБ','Лучшее качество и меньше ошибок. Нужен современный компьютер с хорошей видеокартой и время на первую загрузку.']];
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const labCta=()=>`<div class='tip'><b>Попробуйте на практике.</b> Опишите ИИ задачу по теме этого раздела и посмотрите, что получится.</div><div class='actions' style='justify-content:flex-start'><button class='go alt' onclick="setTab('lab')">Открыть песочницу</button></div>`;
+function labView(inL){
+ const ex=['Калькулятор','Список дел','Игра Угадай число','Таймер обратного отсчёта'];
+ return `<p class='sub'>${inL?`Опишите задачу по схеме из раздела «${sections[cur].title}»: что сделать, для кого и с какими ограничениями.`:'Опишите программу словами: ИИ напишет код, а результат сразу заработает ниже.'} Если код уже есть, новый запрос изменит его. Чтобы начать заново, нажмите «Очистить». Локальная модель скачивается при первом запуске, затем работает прямо в браузере, без ключей и сервера.</p><p class='small' style='margin:14px 0 0'>Выберите модель ИИ. Она работает в вашем браузере и только в версии сайта на своём хостинге:</p><div class='grid mgrid' id='labModels'>${labModels.map((m,i)=>`<button class='card${m[0]===lab.model?' sel':''}' onclick='labPick(${i})'><span class='ct'>${m[1]}</span><span class='tag'>${m[2]}</span><p style='margin-top:8px'>${m[3]}</p></button>`).join('')}</div><p class='small' style='margin:6px 0 0'>Или выберите пример запроса:</p><div class='ex-row'>${ex.map(e=>`<button class='ex' onclick='labEx(this)'>${e}</button>`).join('')}</div><textarea id='labIn' class='labin' placeholder='Например: калькулятор с кнопками, тёмная тема' oninput='lab.prompt=this.value'>${esc(lab.prompt)}</textarea><div class='actions' style='justify-content:flex-start;margin-top:14px'><button class='go' id='labGo' onclick='labRun()'>Сгенерировать</button><button class='go alt' onclick='labClear()'>Очистить</button></div><p class='small' id='labMsg'>${esc(lab.msg)}</p><iframe id='labFrame' class='labframe' sandbox='allow-scripts' title='Результат'></iframe><details class='labcode'><summary>Показать код</summary><pre id='labCode'></pre></details>`;
+}
+function wireLab(){const f=$('labFrame');if(!f)return;f.srcdoc=lab.code||'<p style="font-family:sans-serif;color:#666;padding:16px">Здесь появится результат</p>';$('labCode').textContent=lab.code;$('labGo').disabled=lab.busy;}
+function labPick(i){lab.model=labModels[i][0];document.querySelectorAll('#labModels .card').forEach((c,k)=>c.classList.toggle('sel',k===i));}
+function labEx(b){lab.prompt=b.textContent+' на HTML и JavaScript';$('labIn').value=lab.prompt;}
+function labClear(){lab.prompt='';lab.code='';lab.msg='';$('labIn').value='';$('labMsg').textContent='';wireLab();}
+const labMsg=t=>{lab.msg=t;const e=$('labMsg');if(e)e.textContent=t;};
+function labClean(t){const a=t.indexOf('```');if(a<0){const d=t.search(/<!doctype|<html/i);return (d>=0?t.slice(d):t).trim();}let s=t.slice(a+3).replace(/^html/i,'');const b=s.lastIndexOf('```');if(b>=0)s=s.slice(0,b);return s.trim();}
+let labEng=null,labEngId='';
+async function labEngine(){
+ if(labEng&&labEngId===lab.model)return labEng;
+ labEng=null;
+ let wl;try{wl=await import('https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.79/+esm');}catch(e){throw new Error('локальные модели работают только в версии сайта на своём хостинге');}
+ labEng=await wl.CreateMLCEngine(lab.model,{initProgressCallback:p=>labMsg('Загрузка модели (только в первый раз): '+Math.round((p.progress||0)*100)+'%')});
+ labEngId=lab.model;return labEng;
+}
+async function labRun(){
+ if(lab.busy)return;
+ const p=($('labIn').value||'').trim();lab.prompt=p;
+ if(p.length<3){labMsg('Опишите словами, что нужно сделать.');return;}
+ if(!navigator.gpu){labMsg('Для локальной модели нужен браузер с WebGPU: Chrome или Edge на компьютере, либо свежий Chrome на Android.');return;}
+ lab.busy=true;const g0=$('labGo');if(g0)g0.disabled=true;labMsg('ИИ пишет код…');
+ const F='```';
+ const sys='Ты помощник учебной песочницы для новичков. Напиши один полный HTML-файл (HTML, CSS и JavaScript внутри) для задачи ниже. Без внешних библиотек, сетевых запросов и localStorage. Интерфейс на русском, аккуратный и адаптивный. Документ должен начинаться с <!DOCTYPE html>, все кнопки и функции должны реально работать, код должен быть законченным. Верни только код в блоке '+F+'html без пояснений.\n\n';
+ const task=lab.code?'Вот текущий код:\n'+F+'html\n'+lab.code+'\n'+F+'\nИзмени его по просьбе: '+p:'Задача: '+p;
+ try{
+  let r;{const eng=await labEngine();let acc='';const st=await eng.chat.completions.create({messages:[{role:'user',content:sys+task}],stream:true,temperature:0.2,max_tokens:4000});for await(const ch of st){acc+=(ch.choices[0]&&ch.choices[0].delta&&ch.choices[0].delta.content)||'';labMsg('ИИ пишет код… '+acc.length+' симв.');}r={text:acc};}
+  const c=labClean(r.text||'');
+  if(!c){labMsg('ИИ вернул пустой ответ. Попробуйте ещё раз.');}
+  else{lab.code=c;labMsg(r.truncated?'Код получился слишком длинным и может быть обрезан. Попробуйте упростить задачу.':'Готово! Измените запрос, чтобы доработать программу.');wireLab();}
+ }catch(e){labMsg(e&&e.code==='not_granted'?'Доступ к ИИ не разрешён. Разрешите его и попробуйте снова.':e&&e.code==='rate_limited'?'Слишком много запросов. Подождите минуту.':'Не получилось: '+((e&&e.message)||'попробуйте ещё раз'));}
+ lab.busy=false;const g=$('labGo');if(g)g.disabled=false;
+}
+function closeMenu(){["site","scrim"].forEach(id=>$(id).classList.remove("open"))}
+function toggleMenu(){["site","scrim"].forEach(id=>$(id).classList.toggle("open"))}
+function go(p){closeMenu();page=p;show();window.scrollTo(0,0);}
+function resetAll(){for(const k in scores)delete scores[k];for(const k in best)delete best[k];for(const k in quizzes)delete quizzes[k];cur=0;tab="read";save();show();}
+
+const card=i=>{const s=sections[i],u=unlocked(i);
+ return `<button class="card ${scores[i]?"ok":""}" ${u?"":"disabled"} onclick="openSection(${i})"><span class="ct">${i+1}. ${s.title}</span><span class="tag">${scores[i]?`Зачтено: ${best[i]} из ${s.quiz.length}`:u?"Открыт":`Откроется после раздела «${sections[i-1].title}»`}</span><span class="tag">Тем: ${s.subs.length}, вопросов: ${s.quiz.length}</span></button>`;};
+const pages={
+home:()=>{const n=doneCount(),q=sections.reduce((a,s)=>a+s.quiz.length,0);
+ return `<main class="hero"><h2>Создавайте сайты и приложения вместе с ИИ</h2><p class="sub">Вайбкодинг — это когда вы объясняете задачу словами, а код пишет ИИ. Курс идёт от простого к сложному: каждый раздел опирается на предыдущий и заканчивается тестом.</p><p class="small">${sections.length} разделов, 3 уровня, ${q} вопросов</p><div class="actions" style="justify-content:flex-start"><button class="go" onclick="openSection(nextOpen())">${n?"Продолжить обучение":"Начать курс"}</button><button class="go alt" onclick="go('course')">Смотреть программу</button></div></main>
+ <main><h3 style="margin-top:0">Как проходит обучение</h3><div class="grid"><div class="card"><span class="ct">Читаете</span><p>Короткая теория с примерами, простыми словами и без сложных терминов.</p></div><div class="card"><span class="ct">Проверяете себя</span><p>Тест из трёх–пяти вопросов. Для зачёта нужно ответить верно не меньше чем на две трети.</p></div><div class="card"><span class="ct">Идёте дальше</span><p>Следующий раздел открывается после зачёта и опирается на то, что вы уже умеете.</p></div></div></main>
+ <main><h3 style="margin-top:0">Модули курса</h3><div class="grid"><button class="card" onclick="go('course')"><span class="ct">Модуль 1. ${MOD1.t}</span><span class="tag">3 уровня, ${sections.length} разделов</span><p style="margin-top:8px">${MOD1.d}</p></button>${emptyMods.map(m=>`<div class="card" style="opacity:.55"><span class="ct">${m}</span><span class="tag">Скоро</span></div>`).join("")}</div></main>`;},
+course:()=>`<main><h2>Программа курса</h2><p class="sub">Курс состоит из модулей, модуль из уровней, а уровень из разделов по нарастанию сложности. Закрытый раздел откроется, когда вы сдадите тест предыдущего.</p><h3 class="modh">Модуль 1. ${MOD1.t}</h3><p class="small">${MOD1.d}</p>${levels.map(l=>`<h3>${l.t}</h3><p class="small">${l.d}</p><div class="grid">${l.ids.map(card).join("")}</div>`).join("")}<h3 class="modh">Следующие модули</h3><div class="grid">${emptyMods.map(m=>`<div class="card" style="opacity:.55"><span class="ct">${m}</span><span class="tag">Скоро: здесь появятся новые уроки</span></div>`).join("")}</div></main>`,
+progress:()=>{const n=doneCount(),p=Math.round(n/sections.length*100);
+ return `<main><h2>Ваш прогресс</h2><div class="bar"><div style="width:${p}%"></div></div><p class="small">Зачтено ${n} из ${sections.length} разделов (${p}%)</p>${n===sections.length?`<div class="tip"><b>Курс пройден!</b> Вы готовы придумать и сделать собственный проект.</div>`:`<div class="actions" style="justify-content:flex-start;margin-top:20px"><button class="go" onclick="openSection(nextOpen())">Продолжить обучение</button></div>`}<h3>Результаты тестов</h3><ul class="sub">${sections.map((s,i)=>`<li>${i+1}. ${s.title}: ${i in best?`${best[i]} из ${s.quiz.length}${scores[i]?", зачтено":", не зачтено"}`:"не пройдено"}</li>`).join("")}</ul><div class="actions" style="justify-content:flex-start;margin:24px 0"><button class="go alt" onclick="go('course')">К модулям и уровням</button><button class="go alt" disabled style="cursor:not-allowed" title="Скоро">Следующий модуль (скоро)</button></div><button class="go alt reset" onclick="resetAll()">Сбросить результаты</button></main>`;},
+lab:()=>`<main><h2>Песочница</h2>${labView(false)}</main>`,
+about:()=>`<main><h2>О курсе</h2><h3>Для кого этот курс</h3><div class="sub"><p>Для всех, кто хочет создавать сайты и программы с помощью ИИ: школьников, студентов и взрослых. Программировать уметь не нужно.</p></div><h3>Что вы получите</h3><div class="sub"><p>Понимание, как устроен сайт, умение писать точные запросы, планировать, искать ошибки и беречь данные, а также четыре готовых учебных проекта.</p></div><h3>Как работает зачёт</h3><div class="sub"><p>В конце раздела вы проходите тест. Раздел засчитывается, если верно не меньше двух третей ответов. Неверные ответы можно исправить и проверить снова.</p></div><h3>Где хранятся результаты</h3><div class="sub"><p>Только в вашем браузере. Если открыть сайт с другого устройства или очистить данные браузера, прогресс начнётся заново.</p></div></main>`};
+function show(){
+ const L=page==="lesson";$("lesson").hidden=!L;$("pages").hidden=L;
+ $("site").innerHTML=[["home","Главная"],["course","Программа"],["lab","Песочница"],["progress","Прогресс"],["about","О курсе"]].map(([k,t])=>`<button class="${k===page||(L&&k==="course")?"on":""}" onclick="go('${k}')">${t}</button>`).join("");
+ if(L)render();else{$("pages").innerHTML=pages[page]();if(page==="lab")wireLab();}
+}
+show();
+
+(function(){
+ const c=document.querySelector('.chip');
+ if(!c||!matchMedia('(hover:hover) and (pointer:fine)').matches||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+ const R=280,rest=()=>{c.style.transform='';c.style.boxShadow='';};
+ document.addEventListener('mousemove',e=>{
+  const r=c.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),d=Math.hypot(dx,dy);
+  if(d>R){rest();return;}
+  const k=1-d/R,ry=Math.max(-1,Math.min(1,dx/120))*38*(0.4+k*0.6),rx=-Math.max(-1,Math.min(1,dy/120))*38*(0.4+k*0.6);
+  c.style.transform='perspective(420px) rotateX('+rx.toFixed(1)+'deg) rotateY('+ry.toFixed(1)+'deg) scale('+(1+k*0.18).toFixed(3)+')';
+  c.style.boxShadow=(3-ry/6).toFixed(1)+'px '+(3+rx/6).toFixed(1)+'px 0 #3500D3,0 0 '+Math.round(k*26)+'px rgba(106,61,255,'+(k*0.85).toFixed(2)+')';
+ });
+ document.addEventListener('mouseleave',rest);
+})();
+(function(){
+ const cv=document.getElementById('bg');if(!cv)return;
+ const x=cv.getContext('2d'),G=72,S=18,A=11,f=0.0055;
+ let W,H,last=0;
+ function size(){const D=Math.min(window.devicePixelRatio||1,1.5);W=innerWidth;H=innerHeight;cv.width=W*D;cv.height=H*D;x.setTransform(D,0,0,D,0,0);}
+ const col=i=>i%4===0?'rgba(150,120,255,.26)':'rgba(106,61,255,.14)';
+ function draw(t){
+  x.clearRect(0,0,W,H);x.lineWidth=1;
+  for(let i=0,gx=-G;gx<=W+G;gx+=G,i++){
+   x.beginPath();
+   for(let y=-S;y<=H+S;y+=S){const px=gx+A*Math.sin(y*f+t*0.35+gx*0.012)+A*0.6*Math.sin(y*f*2.3-t*0.25);if(y===-S)x.moveTo(px,y);else x.lineTo(px,y);}
+   x.strokeStyle=col(i);x.stroke();
+  }
+  for(let i=0,gy=-G;gy<=H+G;gy+=G,i++){
+   x.beginPath();
+   for(let xx=-S;xx<=W+S;xx+=S){const py=gy+A*Math.sin(xx*f-t*0.3+gy*0.012)+A*0.6*Math.sin(xx*f*2.1+t*0.22);if(xx===-S)x.moveTo(xx,py);else x.lineTo(xx,py);}
+   x.strokeStyle=col(i);x.stroke();
+  }
+ }
+ size();
+ addEventListener('resize',()=>{size();draw(last);});
+ if(matchMedia('(prefers-reduced-motion:reduce)').matches){draw(0);return;}
+ function loop(ms){last=ms/1000;draw(last);requestAnimationFrame(loop);}
+ requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
